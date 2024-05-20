@@ -1,64 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Elizabeth WebRTC</title>
-    <style>
-        .video-container {
-            display: inline-block;
-            margin: 20px;
-        }
-        .controls {
-            margin-top: 10px;
-        }
-        .control-group {
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
     <h1>Elizabeth WebRTC</h1>
 
-    <h2>1. Start your Webcam</h2>
-    <button id="webcamButton">Start WebCam</button>
-
+    <h2>1. Start and Join Call</h2>
     <div class="videos">
-        <div class="video-container">
-            <h3>Local Stream</h3>
-            <video id="webcamVideo" autoplay playsinline></video>
-            <div class="controls" id="localControls">
-                <!-- Controles de Brilho, Contraste, Saturação, Sepia, Grayscale, Invert, Gama e Volume -->
-                <!-- Controles adicionados aqui -->
-            </div>
+      <div class="video-container">
+        <h3>Local Stream</h3>
+        <video id="webcamVideo" autoplay playsinline></video>
+        <div class="controls" id="localControls">
+          <!-- Controls for local video -->
+          <div class="control-group">
+            <label for="localBrightness">Brightness:</label>
+            <input type="range" id="localBrightness" min="0" max="2" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="localContrast">Contrast:</label>
+            <input type="range" id="localContrast" min="0" max="2" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="localSaturation">Saturation:</label>
+            <input type="range" id="localSaturation" min="0" max="2" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="localSepia">Sepia:</label>
+            <input type="range" id="localSepia" min="0" max="1" step="0.01" value="0">
+          </div>
+          <div class="control-group">
+            <label for="localGrayscale">Grayscale:</label>
+            <input type="range" id="localGrayscale" min="0" max="1" step="0.01" value="0">
+          </div>
+          <div class="control-group">
+            <label for="localInvert">Invert:</label>
+            <input type="range" id="localInvert" min="0" max="1" step="0.01" value="0">
+          </div>
+          <div class="control-group">
+            <label for="localGamma">Gamma:</label>
+            <input type="range" id="localGamma" min="0.1" max="3" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="localVolume">Volume:</label>
+            <input type="range" id="localVolume" min="0" max="1" step="0.01" value="1">
+          </div>
         </div>
-        <div class="video-container">
-            <h3>Remote Stream</h3>
-            <video id="remoteVideo" autoplay playsinline></video>
-            <div class="controls" id="remoteControls">
-                <!-- Controles de Brilho, Contraste, Saturação, Sepia, Grayscale, Invert, Gama e Volume -->
-                <!-- Controles adicionados aqui -->
-            </div>
+      </div>
+      <div class="video-container">
+        <h3>Remote Stream</h3>
+        <video id="remoteVideo" autoplay playsinline></video>
+        <div class="controls" id="remoteControls">
+          <!-- Controls for remote video -->
+          <div class="control-group">
+            <label for="remoteBrightness">Brightness:</label>
+            <input type="range" id="remoteBrightness" min="0" max="2" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="remoteContrast">Contrast:</label>
+            <input type="range" id="remoteContrast" min="0" max="2" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="remoteSaturation">Saturation:</label>
+            <input type="range" id="remoteSaturation" min="0" max="2" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="remoteSepia">Sepia:</label>
+            <input type="range" id="remoteSepia" min="0" max="1" step="0.01" value="0">
+          </div>
+          <div class="control-group">
+            <label for="remoteGrayscale">Grayscale:</label>
+            <input type="range" id="remoteGrayscale" min="0" max="1" step="0.01" value="0">
+          </div>
+          <div class="control-group">
+            <label for="remoteInvert">Invert:</label>
+            <input type="range" id="remoteInvert" min="0" max="1" step="0.01" value="0">
+          </div>
+          <div class="control-group">
+            <label for="remoteGamma">Gamma:</label>
+            <input type="range" id="remoteGamma" min="0.1" max="3" step="0.01" value="1">
+          </div>
+          <div class="control-group">
+            <label for="remoteVolume">Volume:</label>
+            <input type="range" id="remoteVolume" min="0" max="1" step="0.01" value="1">
+          </div>
         </div>
+      </div>
     </div>
-  
-    <h2>2. Create a new Call</h2>
-    <button id="callButton" disabled>Create Call (offer)</button>
-    <input id="callInput" readonly />
-
-    <h2>3. Join a Call</h2>
-    <p>Answer the call from a different browser window or device:</p>
-    <select id="callList"></select>
-    <button id="refreshCallsButton">Refresh Calls</button>
-    <button id="answerButton" disabled>Answer</button>
-
-    <h2>4. Hangup</h2>
-    <button id="hangupButton" disabled>Hangup</button>
-
-    <h2>5. Finish Call</h2>
+    <button id="startButton">Start and Join Call</button>
     <button id="finishCallButton">Finish Call</button>
 
     <script type="module" src="/main.js"></script>
-</body>
+  </body>
 </html>

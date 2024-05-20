@@ -1,5 +1,4 @@
 import './style.css';
-
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
@@ -13,7 +12,6 @@ const firebaseConfig = {
   measurementId: "G-7FSMZY9NWY"
 };
 
-console.log("Initializing Firebase...");
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -28,57 +26,25 @@ const servers = {
   iceCandidatePoolSize: 10,
 };
 
-// Global State
-console.log("Creating RTCPeerConnection...");
 const pc = new RTCPeerConnection(servers);
 let localStream = null;
 let remoteStream = null;
 
-// HTML elements
-const webcamButton = document.getElementById('webcamButton');
+const startButton = document.getElementById('startButton');
 const webcamVideo = document.getElementById('webcamVideo');
-const callButton = document.getElementById('callButton');
-const callInput = document.getElementById('callInput');
-const answerButton = document.getElementById('answerButton');
 const remoteVideo = document.getElementById('remoteVideo');
-const hangupButton = document.getElementById('hangupButton');
 const finishCallButton = document.getElementById('finishCallButton');
-const refreshCallsButton = document.getElementById('refreshCallsButton');
-const callList = document.getElementById('callList');
 
-// Função para listar documentos de chamadas
-console.log("Setting up event listeners...");
-async function listCalls() {
-  const callsSnapshot = await firestore.collection('calls').get();
-  callList.innerHTML = '';
-  callsSnapshot.forEach(doc => {
-    // Verificar se o ID do documento não é igual ao ID da chamada que você criou
-    console.log("Processing call document:", doc.id);
-    if (doc.id !== callInput.value) {
-      const option = document.createElement('option');
-      option.value = doc.id;
-      option.textContent = doc.id;
-      callList.appendChild(option);
-    }
-  });
-}
-
-// 1. Setup media sources
-webcamButton.onclick = async () => {
+startButton.onclick = async () => {
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   remoteStream = new MediaStream();
 
-  // Push tracks from local stream to peer connection
   localStream.getTracks().forEach((track) => {
-    console.log("Adding local track to peer connection:", track.kind);
     pc.addTrack(track, localStream);
   });
 
-  // Pull tracks from remote stream, add to video stream
   pc.ontrack = (event) => {
-    console.log("Received remote track:", event.track.kind);
     event.streams[0].getTracks().forEach((track) => {
-    console.log("Adding remote track to remote stream:", track.kind);
       remoteStream.addTrack(track);
     });
   };
@@ -86,114 +52,97 @@ webcamButton.onclick = async () => {
   webcamVideo.srcObject = localStream;
   remoteVideo.srcObject = remoteStream;
 
-  callButton.disabled = false;
-  answerButton.disabled = false;
-  webcamButton.disabled = true;
-};
+  const callsSnapshot = await firestore.collection('calls').get();
+  const existingCallDoc = callsSnapshot.docs[0];
+  
+  if (existingCallDoc) {
+    const callDoc = firestore.collection('calls').doc(existingCallDoc.id);
+    const answerCandidates = callDoc.collection('answerCandidates');
+    const offerCandidates = callDoc.collection('offerCandidates');
 
-// 2. Create an offer
-callButton.onclick = async () => {
-  console.log("Call button clicked, creating offer...");
-  const callDoc = firestore.collection('calls').doc();
-  const offerCandidates = callDoc.collection('offerCandidates');
-  const answerCandidates = callDoc.collection('answerCandidates');
+    pc.onicecandidate = (event) => {
+      event.candidate && answerCandidates.add(event.candidate.toJSON());
+    };
 
-  callInput.value = callDoc.id;
+    const callData = (await callDoc.get()).data();
+    const offerDescription = callData.offer;
+    await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
 
-  pc.onicecandidate = (event) => {
-    console.log("ICE candidate generated:", event.candidate);
-    event.candidate && offerCandidates.add(event.candidate.toJSON());
-  };
+    const answerDescription = await pc.createAnswer();
+    await pc.setLocalDescription(answerDescription);
 
-  const offerDescription = await pc.createOffer();
-  console.log("Offer created:", offerDescription);
-  await pc.setLocalDescription(offerDescription);
+    const answer = {
+      type: answerDescription.type,
+      sdp: answerDescription.sdp,
+    };
 
-  const offer = {
-    sdp: offerDescription.sdp,
-    type: offerDescription.type,
-  };
+    await callDoc.update({ answer });
 
-  await callDoc.set({ offer });
+    offerCandidates.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          let data = change.doc.data();
+          pc.addIceCandidate(new RTCIceCandidate(data));
+        }
+      });
+    });
 
-  callDoc.onSnapshot((snapshot) => {
-    const data = snapshot.data();
-    if (!pc.currentRemoteDescription && data?.answer) {
-      const answerDescription = new RTCSessionDescription(data.answer);
-      console.log("Remote answer received:", answerDescription);
-      pc.setRemoteDescription(answerDescription);
-    }
-  });
+  } else {
+    const callDoc = firestore.collection('calls').doc();
+    const offerCandidates = callDoc.collection('offerCandidates');
+    const answerCandidates = callDoc.collection('answerCandidates');
 
-  answerCandidates.onSnapshot((snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-      if (change.type === 'added') {
-        console.log("Answer candidate added:", change.doc.data());
-        const candidate = new RTCIceCandidate(change.doc.data());
-        pc.addIceCandidate(candidate);
+    pc.onicecandidate = (event) => {
+      event.candidate && offerCandidates.add(event.candidate.toJSON());
+    };
+
+    const offerDescription = await pc.createOffer();
+    await pc.setLocalDescription(offerDescription);
+
+    const offer = {
+      sdp: offerDescription.sdp,
+      type: offerDescription.type,
+    };
+
+    await callDoc.set({ offer });
+
+    callDoc.onSnapshot((snapshot) => {
+      const data = snapshot.data();
+      if (!pc.currentRemoteDescription && data?.answer) {
+        const answerDescription = new RTCSessionDescription(data.answer);
+        pc.setRemoteDescription(answerDescription);
       }
     });
-  });
 
-  hangupButton.disabled = false;
-  console.log("Call initiated.");
-};
-
-// 3. Answer the call with the unique ID
-answerButton.onclick = async () => {
-  const callId = callInput.value;
-  const callDoc = firestore.collection('calls').doc(callId);
-  const answerCandidates = callDoc.collection('answerCandidates');
-  const offerCandidates = callDoc.collection('offerCandidates');
-
-  pc.onicecandidate = (event) => {
-    event.candidate && answerCandidates.add(event.candidate.toJSON());
-  };
-
-  const callData = (await callDoc.get()).data();
-
-  const offerDescription = callData.offer;
-  await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
-
-  const answerDescription = await pc.createAnswer();
-  await pc.setLocalDescription(answerDescription);
-
-  const answer = {
-    type: answerDescription.type,
-    sdp: answerDescription.sdp,
-  };
-
-  await callDoc.update({ answer });
-
-  offerCandidates.onSnapshot((snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-      if (change.type === 'added') {
-        let data = change.doc.data();
-        pc.addIceCandidate(new RTCIceCandidate(data));
-      }
+    answerCandidates.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const candidate = new RTCIceCandidate(change.doc.data());
+          pc.addIceCandidate(candidate);
+        }
+      });
     });
-  });
+  }
+
+  finishCallButton.disabled = false;
+  startButton.disabled = true;
 };
 
-// 4. Clean up the call and documents in Firestore
 finishCallButton.onclick = async () => {
   const callsSnapshot = await firestore.collection('calls').get();
   const batch = firestore.batch();
 
   callsSnapshot.forEach(doc => {
     batch.delete(doc.ref);
-    console.log("Deleted....");
   });
 
   await batch.commit();
-  alert('All call documents have been deleted.');
-  console.log("All call documents have been deleted.");
-};
+  alert('Call has been finished and all call documents have been deleted.');
 
-// Refresh call list
-refreshCallsButton.onclick = () => {
-  listCalls();
-};
+  pc.close();
+  localStream.getTracks().forEach(track => track.stop());
+  remoteStream.getTracks().forEach(track => track.stop());
 
-// Initial call list load
-listCalls();
+  finishCallButton.disabled = true;
+  startButton.disabled = false;
+};
