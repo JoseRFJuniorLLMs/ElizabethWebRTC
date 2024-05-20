@@ -42,22 +42,6 @@ const webcamVideo = document.getElementById('webcamVideo');
 const remoteVideo = document.getElementById('remoteVideo');
 const startAudioButton = document.getElementById('startAudioButton');
 
-const localControls = {
-  brightness: document.getElementById('localBrightness'),
-  contrast: document.getElementById('localContrast'),
-  saturation: document.getElementById('localSaturation'),
-  sepia: document.getElementById('localSepia'),
-  grayscale: document.getElementById('localGrayscale'),
-  invert: document.getElementById('localInvert'),
-  gamma: document.getElementById('localGamma'),
-  volume: document.getElementById('localVolume'),
-  pan: document.getElementById('localPan'),
-  tilt: document.getElementById('localTilt'),
-  zoom: document.getElementById('localZoom'),
-  resolution: document.getElementById('localResolution'),
-  size: document.getElementById('localSize')
-};
-
 const remoteControls = {
   brightness: document.getElementById('remoteBrightness'),
   contrast: document.getElementById('remoteContrast'),
@@ -147,36 +131,6 @@ const updateProgress = (time) => {
     .map((v) => (v < 10 ? '0' + v : v))
     .join(':');
   document.querySelector('#progress').textContent = formattedTime;
-};
-
-const applyLocalFilters = () => {
-  webcamVideo.style.filter = `
-    brightness(${localControls.brightness.value})
-    contrast(${localControls.contrast.value})
-    saturate(${localControls.saturation.value})
-    sepia(${localControls.sepia.value})
-    grayscale(${localControls.grayscale.value})
-    invert(${localControls.invert.value})
-    `;
-  webcamVideo.style.transform = `
-    scale(${localControls.zoom.value})
-    rotateX(${localControls.tilt.value}deg)
-    `;
-};
-
-const applyRemoteFilters = () => {
-  remoteVideo.style.filter = `
-    brightness(${remoteControls.brightness.value})
-    contrast(${remoteControls.contrast.value})
-    saturate(${remoteControls.saturation.value})
-    sepia(${remoteControls.sepia.value})
-    grayscale(${remoteControls.grayscale.value})
-    invert(${remoteControls.invert.value})
-    `;
-  remoteVideo.style.transform = `
-    scale(${remoteControls.zoom.value})
-    rotateX(${remoteControls.tilt.value}deg)
-    `;
 };
 
 const setVolume = (videoElement, volume) => {
@@ -348,5 +302,8 @@ document.querySelector('input[type="checkbox"]').onclick = (e) => {
   scrollingWaveform = e.target.checked;
   createWaveSurfer();
 };
+  
+// Configurar listeners dos controles locais e remotos
+setupControlListeners(localControls, applyLocalFilters);
 
 setupControlListeners();
