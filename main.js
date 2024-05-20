@@ -13,6 +13,7 @@ const firebaseConfig = {
   measurementId: "G-7FSMZY9NWY"
 };
 
+console.log("Initializing Firebase...");
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -28,6 +29,7 @@ const servers = {
 };
 
 // Global State
+console.log("Creating RTCPeerConnection...");
 const pc = new RTCPeerConnection(servers);
 let localStream = null;
 let remoteStream = null;
@@ -44,24 +46,14 @@ const finishCallButton = document.getElementById('finishCallButton');
 const refreshCallsButton = document.getElementById('refreshCallsButton');
 const callList = document.getElementById('callList');
 
-// Function to list call documents
-/* async function listCalls() {
-  const callsSnapshot = await firestore.collection('calls').get();
-  callList.innerHTML = '';
-  callsSnapshot.forEach(doc => {
-    const option = document.createElement('option');
-    option.value = doc.id;
-    option.textContent = doc.id;
-    callList.appendChild(option);
-  });
-} */
-
 // Função para listar documentos de chamadas
+console.log("Setting up event listeners...");
 async function listCalls() {
   const callsSnapshot = await firestore.collection('calls').get();
   callList.innerHTML = '';
   callsSnapshot.forEach(doc => {
     // Verificar se o ID do documento não é igual ao ID da chamada que você criou
+    console.log("Processing call document:", doc.id);
     if (doc.id !== callInput.value) {
       const option = document.createElement('option');
       option.value = doc.id;
@@ -78,12 +70,15 @@ webcamButton.onclick = async () => {
 
   // Push tracks from local stream to peer connection
   localStream.getTracks().forEach((track) => {
+    console.log("Adding local track to peer connection:", track.kind);
     pc.addTrack(track, localStream);
   });
 
   // Pull tracks from remote stream, add to video stream
   pc.ontrack = (event) => {
+    console.log("Received remote track:", event.track.kind);
     event.streams[0].getTracks().forEach((track) => {
+    console.log("Adding remote track to remote stream:", track.kind);
       remoteStream.addTrack(track);
     });
   };
@@ -98,6 +93,7 @@ webcamButton.onclick = async () => {
 
 // 2. Create an offer
 callButton.onclick = async () => {
+  console.log("Call button clicked, creating offer...");
   const callDoc = firestore.collection('calls').doc();
   const offerCandidates = callDoc.collection('offerCandidates');
   const answerCandidates = callDoc.collection('answerCandidates');
@@ -105,10 +101,12 @@ callButton.onclick = async () => {
   callInput.value = callDoc.id;
 
   pc.onicecandidate = (event) => {
+    console.log("ICE candidate generated:", event.candidate);
     event.candidate && offerCandidates.add(event.candidate.toJSON());
   };
 
   const offerDescription = await pc.createOffer();
+  console.log("Offer created:", offerDescription);
   await pc.setLocalDescription(offerDescription);
 
   const offer = {
@@ -122,6 +120,7 @@ callButton.onclick = async () => {
     const data = snapshot.data();
     if (!pc.currentRemoteDescription && data?.answer) {
       const answerDescription = new RTCSessionDescription(data.answer);
+      console.log("Remote answer received:", answerDescription);
       pc.setRemoteDescription(answerDescription);
     }
   });
@@ -129,6 +128,7 @@ callButton.onclick = async () => {
   answerCandidates.onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
+        console.log("Answer candidate added:", change.doc.data());
         const candidate = new RTCIceCandidate(change.doc.data());
         pc.addIceCandidate(candidate);
       }
@@ -136,6 +136,7 @@ callButton.onclick = async () => {
   });
 
   hangupButton.disabled = false;
+  console.log("Call initiated.");
 };
 
 // 3. Answer the call with the unique ID
@@ -181,10 +182,12 @@ finishCallButton.onclick = async () => {
 
   callsSnapshot.forEach(doc => {
     batch.delete(doc.ref);
+    console.log("Deleted....");
   });
 
   await batch.commit();
   alert('All call documents have been deleted.');
+  console.log("All call documents have been deleted.");
 };
 
 // Refresh call list
