@@ -47,8 +47,19 @@ const createWaveSurfer = () => {
   }
   wavesurfer = WaveSurfer.create({
     container: '#localWaveform',
-    waveColor: 'rgb(200, 0, 200)',
-    progressColor: 'rgb(100, 0, 100)',
+    waveColor: 'rgb(33, 150, 243)', // Light Blue from image
+    progressColor: 'rgb(135, 206, 235)', // Sky Blue
+    cursorColor: 'rgb(0, 0, 0)',
+    cursorWidth: 6,
+    barGap: 3,
+    barWidth: 2,
+    barHeight: 3,
+    barRadius: 100,
+    autoScroll: true,
+    autoCenter: true,
+    interact: true,
+    dragToSeek: true,
+    fillParent: true
   });
 
   record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }));
@@ -58,9 +69,22 @@ const createWaveSurfer = () => {
 
     const recordedWaveSurfer = WaveSurfer.create({
       container,
-      waveColor: 'rgb(200, 100, 0)',
-      progressColor: 'rgb(100, 50, 0)',
-      url: recordedUrl,
+      waveColor: 'rgb(33, 150, 243)', // Light Blue from image
+      progressColor: 'rgb(135, 206, 235)', // Sky Blue
+      cursorColor: 'rgb(0, 0, 0)',
+      cursorWidth: 6,
+      barGap: 3,
+      barWidth: 2,
+      barHeight: 3,
+      barRadius: 100,
+      autoScroll: true,
+      autoCenter: true,
+      interact: true,
+      dragToSeek: true,
+      mediaControls: true,
+      autoplay: true,
+      fillParent: true,
+      url: recordedUrl
     });
 
     const button = container.appendChild(document.createElement('button'));
