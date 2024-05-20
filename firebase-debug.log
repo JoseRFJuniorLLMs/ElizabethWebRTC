@@ -1,0 +1,72 @@
+[debug] [2024-05-20T05:16:46.774Z] ----------------------------------------------------------------------
+[debug] [2024-05-20T05:16:46.778Z] Command:       D:\dev\firebase-tools-instant-win2.exe C:\Users\web2a\.cache\firebase\tools\lib\node_modules\firebase-tools\lib\bin\firebase deploy
+[debug] [2024-05-20T05:16:46.780Z] CLI Version:   13.9.0
+[debug] [2024-05-20T05:16:46.782Z] Platform:      win32
+[debug] [2024-05-20T05:16:46.782Z] Node Version:  v18.5.0
+[debug] [2024-05-20T05:16:46.783Z] Time:          Mon May 20 2024 06:16:46 GMT+0100 (GMT+01:00)
+[debug] [2024-05-20T05:16:46.784Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-05-20T05:16:46.975Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-05-20T05:16:46.977Z] > authorizing via signed-in user (putagurdjieff@gmail.com)
+[debug] [2024-05-20T05:16:46.977Z] [iam] checking project elizabethwebrtc for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-05-20T05:16:46.984Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/elizabethwebrtc:testIamPermissions [none]
+[debug] [2024-05-20T05:16:46.984Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/elizabethwebrtc:testIamPermissions x-goog-quota-user=projects/elizabethwebrtc
+[debug] [2024-05-20T05:16:46.985Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/elizabethwebrtc:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-05-20T05:16:48.030Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/elizabethwebrtc:testIamPermissions 200
+[debug] [2024-05-20T05:16:48.031Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/elizabethwebrtc:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-05-20T05:16:48.034Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/elizabethwebrtc [none]
+[debug] [2024-05-20T05:16:48.539Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/elizabethwebrtc 200
+[debug] [2024-05-20T05:16:48.540Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/elizabethwebrtc {"projectId":"elizabethwebrtc","projectNumber":"152018904860","displayName":"elizabethwebrtc","name":"projects/elizabethwebrtc","resources":{"hostingSite":"elizabethwebrtc"},"state":"ACTIVE","etag":"1_fdb3d15d-7860-4cc7-b3bd-d4703cbcd722"}
+[info] 
+[info] === Deploying to 'elizabethwebrtc'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2024-05-20T05:16:48.561Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/elizabethwebrtc/versions [none]
+[debug] [2024-05-20T05:16:48.562Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/elizabethwebrtc/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2024-05-20T05:16:50.368Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/elizabethwebrtc/versions 200
+[debug] [2024-05-20T05:16:50.368Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/elizabethwebrtc/versions {"name":"projects/152018904860/sites/elizabethwebrtc/versions/c8568f5372bf6276","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[elizabethwebrtc]: beginning deploy... 
+[info] i  hosting[elizabethwebrtc]: found 8 files in dist 
+[debug] [2024-05-20T05:16:50.391Z] [hosting] uploading with 200 concurrency
+[debug] [2024-05-20T05:16:50.659Z] [hosting] hash cache [ZGlzdA] stored for 8 files
+[debug] [2024-05-20T05:16:50.659Z] [hosting][hash queue][FINAL] {"max":254,"min":40,"avg":74.375,"active":0,"complete":8,"success":8,"errored":0,"retried":0,"total":8,"elapsed":263}
+[debug] [2024-05-20T05:16:50.660Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/152018904860/sites/elizabethwebrtc/versions/c8568f5372bf6276:populateFiles [none]
+[debug] [2024-05-20T05:16:50.660Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/152018904860/sites/elizabethwebrtc/versions/c8568f5372bf6276:populateFiles {"files":{"/assets/favicon.17e50649.svg":"f10e35e94d29e2f48b4935de3a9fed8f8616d28739d715fcc4234e2ce6bd4160","/assets/index.3de1c033.js":"47c225b2fc83d72b0a5eb0c55cded649346970026f9d09627ba0245115339a0e","/assets/index.bfe0277a.css":"5c061a35d5fcfd48860523500b3cc65091fcf17a550a21dd0577b8550cecd1bc","/assets/log.fad7a998.png":"ad1d4fa4a8b0ced946b9b44be86cbc2ba9404b4b22d20a27434ac44909f2f4b3","/index.html":"eb821aa075eb66c47c8ad4f0b1707e018236ea8980f8e13317355aceaa295630","/assets/end-cam.f46ad994.png":"81a49e847d61a6a4983323e4bed70ebc70511e5c4456b5f6ab9e8bb801b28538","/assets/cam.31e2c7d4.png":"e26c3b55f56d8161d81cbba5252c9b7e3e91d7f10b47ffd0fa97fc3767d1841d","/assets/vendor.519c7c38.js":"acaea8ed63535dbbd4a837b762eb20ce8fcb60956253dc53d616ad82a8e28a46"}}
+[debug] [2024-05-20T05:16:51.922Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/152018904860/sites/elizabethwebrtc/versions/c8568f5372bf6276:populateFiles 200
+[debug] [2024-05-20T05:16:51.922Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/152018904860/sites/elizabethwebrtc/versions/c8568f5372bf6276:populateFiles {"uploadRequiredHashes":["5c061a35d5fcfd48860523500b3cc65091fcf17a550a21dd0577b8550cecd1bc","eb821aa075eb66c47c8ad4f0b1707e018236ea8980f8e13317355aceaa295630"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files"}
+[debug] [2024-05-20T05:16:51.926Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/5c061a35d5fcfd48860523500b3cc65091fcf17a550a21dd0577b8550cecd1bc [none]
+[debug] [2024-05-20T05:16:51.926Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/5c061a35d5fcfd48860523500b3cc65091fcf17a550a21dd0577b8550cecd1bc [stream]
+[debug] [2024-05-20T05:16:51.932Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/eb821aa075eb66c47c8ad4f0b1707e018236ea8980f8e13317355aceaa295630 [none]
+[debug] [2024-05-20T05:16:51.933Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/eb821aa075eb66c47c8ad4f0b1707e018236ea8980f8e13317355aceaa295630 [stream]
+[debug] [2024-05-20T05:16:51.936Z] [hosting][populate queue][FINAL] {"max":1269,"min":1269,"avg":1269,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1280}
+[debug] [2024-05-20T05:16:51.936Z] [hosting] uploads queued: 2
+[debug] [2024-05-20T05:16:53.276Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/eb821aa075eb66c47c8ad4f0b1707e018236ea8980f8e13317355aceaa295630 200
+[debug] [2024-05-20T05:16:53.276Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/eb821aa075eb66c47c8ad4f0b1707e018236ea8980f8e13317355aceaa295630 [stream]
+[debug] [2024-05-20T05:16:53.395Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/5c061a35d5fcfd48860523500b3cc65091fcf17a550a21dd0577b8550cecd1bc 200
+[debug] [2024-05-20T05:16:53.395Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/elizabethwebrtc/versions/c8568f5372bf6276/files/5c061a35d5fcfd48860523500b3cc65091fcf17a550a21dd0577b8550cecd1bc [stream]
+[debug] [2024-05-20T05:16:53.396Z] [hosting][upload queue][FINAL] {"max":1474,"min":1352,"avg":1413,"active":0,"complete":2,"success":2,"errored":0,"retried":0,"total":2,"elapsed":1474}
+[info] +  hosting[elizabethwebrtc]: file upload complete 
+[debug] [2024-05-20T05:16:53.398Z] [hosting] deploy completed after 3024ms
+[debug] [2024-05-20T05:16:53.399Z] [
+  {
+    "config": {
+      "public": "dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "elizabethwebrtc"
+    },
+    "version": "projects/152018904860/sites/elizabethwebrtc/versions/c8568f5372bf6276"
+  }
+]
+[info] i  hosting[elizabethwebrtc]: finalizing version... 
+[debug] [2024-05-20T05:16:53.406Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/elizabethwebrtc/versions/c8568f5372bf6276 updateMask=status%2Cconfig
+[debug] [2024-05-20T05:16:53.407Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/elizabethwebrtc/versions/c8568f5372bf6276 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
