@@ -112,6 +112,10 @@ startButton.onclick = async () => {
   webcamVideo.srcObject = localStream;
   remoteVideo.srcObject = remoteStream;
 
+  // Start WaveSurfer for audio visualization
+  createWaveSurfer();
+  record.startRecording();
+
   const callsSnapshot = await firestore.collection('calls').get();
   const existingCallDoc = callsSnapshot.docs[0];
 
@@ -224,7 +228,6 @@ firestore.collection('calls').onSnapshot((snapshot) => {
 });
 
 startAudioButton.onclick = () => {
-  
   const notificationSound = document.getElementById('notificationSound');
   notificationSound.play();
 
