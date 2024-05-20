@@ -224,6 +224,10 @@ firestore.collection('calls').onSnapshot((snapshot) => {
 });
 
 startAudioButton.onclick = () => {
+  
+  const notificationSound = document.getElementById('notificationSound');
+  notificationSound.play();
+
   createWaveSurfer();
   record.startRecording();
 };
