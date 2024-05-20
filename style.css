@@ -21,3 +21,42 @@ video {
   align-items: center;
   justify-content: center;
 }
+
+button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+button img {
+  width: 50px; /* Adjust the size as needed */
+  height: 50px; /* Adjust the size as needed */
+  border-radius: 50%; /* Makes the image rounded */
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.control-group {
+  margin-bottom: 1rem;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.control-group input,
+.control-group select {
+  width: 100%;
+}
+
+#localWaveform {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 1rem;
+}

@@ -9,8 +9,9 @@
 </head>
 <body>
   <h1>Elizabeth WebRTC</h1>
-  <button id="startButton">Start and Join Call</button>
-  <button id="finishCallButton">Finish Call</button>
+  <button id="startButton"><img src="cam.png" alt="Start Call" /></button>
+  <button id="finishCallButton"><img src="end-cam.png" alt="Finish Call" /></button>
+ 
   <div class="videos">
     <div class="video-container">
       <h3>Local Stream</h3>
@@ -91,7 +92,7 @@
           <label for="remoteSaturation">Saturation:</label>
           <input type="range" id="remoteSaturation" min="0" max="2" step="0.01" value="1">
         </div>
-        <div class="control-group">
+        <div class=" control-group">
           <label for="remoteSepia">Sepia:</label>
           <input type="range" id="remoteSepia" min="0" max="1" step="0.01" value="0">
         </div>
@@ -136,6 +137,6 @@
       </div>
     </div>
   </div>
-  <script type="module" src="/main.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
