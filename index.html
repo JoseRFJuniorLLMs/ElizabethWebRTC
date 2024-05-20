@@ -9,11 +9,17 @@
 </head>
 <body>
   <h1>Elizabeth WebRTC</h1>
+  
   <audio id="notificationSound" src="som.mp3"></audio>
   <button id="startButton"><img src="cam.png" alt="Start Call" /></button>
+  <button id="startAudioButton"><img src="mic.png" alt="Start Call" /></button>
   <button id="finishCallButton"><img src="end-cam.png" alt="Finish Call" /></button>
   <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
 
+  <div id="waveform-container">
+    <div id="localWaveform" style="border: 1px solid #ddd; border-radius: 4px; margin-top: 1rem"></div>
+  </div>
+  
   <div class="videos">
     <div class="video-container">
       <h3>Local Stream</h3>
@@ -75,7 +81,6 @@
           </select>
         </div>
       </div>
-      <div id="localWaveform" style="border: 1px solid #ddd; border-radius: 4px; margin-top: 1rem"></div>
     </div>
     <div class="video-container">
       <h3>Remote Stream</h3>
@@ -94,7 +99,7 @@
           <label for="remoteSaturation">Saturation:</label>
           <input type="range" id="remoteSaturation" min="0" max="2" step="0.01" value="1">
         </div>
-        <div class=" control-group">
+        <div class="control-group">
           <label for="remoteSepia">Sepia:</label>
           <input type="range" id="remoteSepia" min="0" max="1" step="0.01" value="0">
         </div>
@@ -136,10 +141,13 @@
             <option value="fullhd">Full HD (1920x1080)</option>
           </select>
         </div>
-       
-    </div>
+      </div>
     </div>
   </div>
+
+  <div id="progress" style="margin-top: 1rem; font-size: 1.2rem;"></div>
+  <div id="recordings" style="margin-top: 1rem;"></div>
+
   <script type="module" src="./main.js"></script>
 </body>
 </html>
