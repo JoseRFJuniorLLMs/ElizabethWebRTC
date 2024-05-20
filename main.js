@@ -42,37 +42,9 @@ const remoteVideo = document.getElementById('remoteVideo');
 const startAudioButton = document.getElementById('startAudioButton');
 const localSizeControl = document.getElementById('localSize');
 
-const localControls = {
-  brightness: document.getElementById('localBrightness'),
-  contrast: document.getElementById('localContrast'),
-  saturation: document.getElementById('localSaturation'),
-  sepia: document.getElementById('localSepia'),
-  grayscale: document.getElementById('localGrayscale'),
-  invert: document.getElementById('localInvert'),
-  gamma: document.getElementById('localGamma'),
-  volume: document.getElementById('localVolume'),
-  pan: document.getElementById('localPan'),
-  tilt: document.getElementById('localTilt'),
-  zoom: document.getElementById('localZoom'),
-  resolution: document.getElementById('localResolution'),
-  size: document.getElementById('localSize')
-};
+const localControls = document.getElementById('localControls');
+const remoteControls = document.getElementById('remoteControls');
 
-const remoteControls = {
-  brightness: document.getElementById('remoteBrightness'),
-  contrast: document.getElementById('remoteContrast'),
-  saturation: document.getElementById('remoteSaturation'),
-  sepia: document.getElementById('remoteSepia'),
-  grayscale: document.getElementById('remoteGrayscale'),
-  invert: document.getElementById('remoteInvert'),
-  gamma: document.getElementById('remoteGamma'),
-  volume: document.getElementById('remoteVolume'),
-  pan: document.getElementById('remotePan'),
-  tilt: document.getElementById('remoteTilt'),
-  zoom: document.getElementById('remoteZoom'),
-  resolution: document.getElementById('remoteResolution'),
-  size: document.getElementById('remoteSize')
-};
 
 const createWaveSurfer = () => {
   if (wavesurfer) {
@@ -149,57 +121,10 @@ const updateProgress = (time) => {
   document.querySelector('#progress').textContent = formattedTime;
 };
 
-const applyLocalFilters = () => {
-  webcamVideo.style.filter = `
-    brightness(${localControls.brightness.value})
-    contrast(${localControls.contrast.value})
-    saturate(${localControls.saturation.value})
-    sepia(${localControls.sepia.value})
-    grayscale(${localControls.grayscale.value})
-    invert(${localControls.invert.value})
-    `;
-  webcamVideo.style.transform = `
-    scale(${localControls.zoom.value})
-    rotateX(${localControls.tilt.value}deg)
-    `;
-};
-
-const applyRemoteFilters = () => {
-  remoteVideo.style.filter = `
-    brightness(${remoteControls.brightness.value})
-    contrast(${remoteControls.contrast.value})
-    saturate(${remoteControls.saturation.value})
-    sepia(${remoteControls.sepia.value})
-    grayscale(${remoteControls.grayscale.value})
-    invert(${remoteControls.invert.value})
-    `;
-  remoteVideo.style.transform = `
-    scale(${remoteControls.zoom.value})
-    rotateX(${remoteControls.tilt.value}deg)
-    `;
-};
-
 const setVolume = (videoElement, volume) => {
   videoElement.volume = volume;
 };
 
-const setupControlListeners = () => {
-  Object.keys(localControls).forEach(control => {
-    if (control !== 'volume') {
-      localControls[control].addEventListener('input', applyLocalFilters);
-    } else {
-      localControls[control].addEventListener('input', () => setVolume(webcamVideo, localControls[control].value));
-    }
-  });
-
-  Object.keys(remoteControls).forEach(control => {
-    if (control !== 'volume') {
-      remoteControls[control].addEventListener('input', applyRemoteFilters);
-    } else {
-      remoteControls[control].addEventListener('input', () => setVolume(remoteVideo, remoteControls[control].value));
-    }
-  });
-};
 
 startButton.onclick = async () => {
   const notificationSound = document.getElementById('notificationSound');
@@ -339,7 +264,6 @@ firestore.collection('calls').onSnapshot((snapshot) => {
 startAudioButton.onclick = () => {
   const notificationSound = document.getElementById('notificationSound');
   notificationSound.play();
-
   createWaveSurfer();
   record.startRecording();
 };
@@ -358,6 +282,89 @@ const adjustVideoSize = () => {
 // Adiciona o evento para ajustar o tamanho do vídeo quando o controle for alterado
 localSizeControl.addEventListener('input', adjustVideoSize);
 
-// Inicializa o tamanho do vídeo ao carregar a página
+const addVideoControlListeners = (controlsContainer, videoElement) => {
+  controlsContainer.querySelectorAll('input[type="range"], select').forEach(control => {
+    control.addEventListener('input', (event) => {
+      const { id, value } = event.target;
+      switch (id) {
+        case 'localBrightness':
+        case 'remoteBrightness':
+          videoElement.style.filter = `brightness(${value})`;
+          break;
+        case 'localContrast':
+        case 'remoteContrast':
+          videoElement.style.filter += ` contrast(${value})`;
+          break;
+        case 'localSaturation':
+        case 'remoteSaturation':
+          videoElement.style.filter += ` saturate(${value})`;
+          break;
+        case 'localSepia':
+        case 'remoteSepia':
+          videoElement.style.filter += ` sepia(${value})`;
+          break;
+        case 'localGrayscale':
+        case 'remoteGrayscale':
+          videoElement.style.filter += ` grayscale(${value})`;
+          break;
+        case 'localInvert':
+        case 'remoteInvert':
+          videoElement.style.filter += ` invert(${value})`;
+          break;
+        case 'localGamma':
+        case 'remoteGamma':
+          videoElement.style.filter += ` contrast(${value})`;
+          break;
+        case 'localVolume':
+        case 'remoteVolume':
+          videoElement.volume = value;
+          break;
+        case 'localPan':
+        case 'remotePan':
+          videoElement.style.objectPosition = `${value * 100}% center`;
+          break;
+        case 'localTilt':
+        case 'remoteTilt':
+          videoElement.style.transform = `rotate(${value}deg)`;
+          break;
+        case 'localZoom':
+        case 'remoteZoom':
+          videoElement.style.transform += ` scale(${value})`;
+          break;
+        case 'localResolution':
+        case 'remoteResolution':
+          changeResolution(videoElement, value);
+          break;
+      }
+    });
+  });
+};
+
+const changeResolution = (videoElement, resolution) => {
+  switch (resolution) {
+    case 'qvga':
+      videoElement.width = 320;
+      videoElement.height = 240;
+      break;
+    case 'vga':
+      videoElement.width = 640;
+      videoElement.height = 480;
+      break;
+    case 'hd':
+      videoElement.width = 1280;
+      videoElement.height = 720;
+      break;
+    case 'fullhd':
+      videoElement.width = 1920;
+      videoElement.height = 1080;
+      break;
+    default:
+      videoElement.width = 640;
+      videoElement.height = 480;
+      break;
+  }
+};
+
+addVideoControlListeners(localControls, webcamVideo);
+addVideoControlListeners(remoteControls, remoteVideo);
 adjustVideoSize();
-setupControlListeners();
