@@ -156,3 +156,4 @@ firestore.collection('calls').onSnapshot((snapshot) => {
     logImage.style.display = 'none';
   }
 });
+
