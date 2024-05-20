@@ -37,6 +37,10 @@ const webcamVideo = document.getElementById('webcamVideo');
 const remoteVideo = document.getElementById('remoteVideo');
 
 startButton.onclick = async () => {
+  
+  const notificationSound = document.getElementById('notificationSound');
+  notificationSound.play();
+
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   remoteStream = new MediaStream();
 
@@ -57,6 +61,8 @@ startButton.onclick = async () => {
   const existingCallDoc = callsSnapshot.docs[0];
   
   if (existingCallDoc) {
+    const notificationSound = document.getElementById('notificationSound');
+    notificationSound.play();
     const callDoc = firestore.collection('calls').doc(existingCallDoc.id);
     const answerCandidates = callDoc.collection('answerCandidates');
     const offerCandidates = callDoc.collection('offerCandidates');
