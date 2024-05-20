@@ -40,6 +40,7 @@ const logImage = document.getElementById('logImage');
 const webcamVideo = document.getElementById('webcamVideo');
 const remoteVideo = document.getElementById('remoteVideo');
 const startAudioButton = document.getElementById('startAudioButton');
+const localSizeControl = document.getElementById('localSize');
 
 const localControls = {
   brightness: document.getElementById('localBrightness'),
@@ -348,4 +349,15 @@ document.querySelector('input[type="checkbox"]').onclick = (e) => {
   createWaveSurfer();
 };
 
+// Função para ajustar o tamanho do vídeo conforme o controle de tamanho
+const adjustVideoSize = () => {
+  const size = localSizeControl.value;
+  webcamVideo.style.transform = `scale(${size})`;
+};
+
+// Adiciona o evento para ajustar o tamanho do vídeo quando o controle for alterado
+localSizeControl.addEventListener('input', adjustVideoSize);
+
+// Inicializa o tamanho do vídeo ao carregar a página
+adjustVideoSize();
 setupControlListeners();
