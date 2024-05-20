@@ -21,7 +21,6 @@
   
   <div class="videos">
     <div class="video-container">
-      <h3>Local Stream</h3>
       <video id="webcamVideo" autoplay playsinline></video>
       <div class="controls" id="localControls">
         <!-- Controls for local video -->
@@ -42,32 +41,8 @@
           <input type="range" id="localSepia" min="0" max="1" step="0.01" value="0">
         </div>
         <div class="control-group">
-          <label for="localGrayscale">Grayscale:</label>
-          <input type="range" id="localGrayscale" min="0" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="localInvert">Invert:</label>
-          <input type="range" id="localInvert" min="0" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="localGamma">Gamma:</label>
-          <input type="range" id="localGamma" min="0.1" max="3" step="0.01" value="1">
-        </div>
-        <div class="control-group">
           <label for="localVolume">Volume:</label>
           <input type="range" id="localVolume" min="0" max="1" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="localPan">Pan:</label>
-          <input type="range" id="localPan" min="-1" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="localTilt">Tilt:</label>
-          <input type="range" id="localTilt" min="-90" max="90" step="1" value="0">
-        </div>
-        <div class="control-group">
-          <label for="localZoom">Zoom:</label>
-          <input type="range" id="localZoom" min="1" max="3" step="0.1" value="1">
         </div>
         <div class="control-group">
           <label for="localResolution">Resolution:</label>
@@ -79,73 +54,19 @@
             <option value="fullhd">Full HD (1920x1080)</option>
           </select>
         </div>
+        <div class="control-group">
+          <label for="localSize">Size:</label>
+          <input type="range" id="localSize" min="1" max="3" step="0.1" value="1">
+        </div>
       </div>
     </div>
     <div class="video-container">
-      <h3>Remote Stream</h3>
       <video id="remoteVideo" autoplay playsinline></video>
-      <div class="controls" id="remoteControls">
-        <!-- Controls for remote video -->
-        <div class="control-group">
-          <label for="remoteBrightness">Brightness:</label>
-          <input type="range" id="remoteBrightness" min="0" max="2" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="remoteContrast">Contrast:</label>
-          <input type="range" id="remoteContrast" min="0" max="2" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="remoteSaturation">Saturation:</label>
-          <input type="range" id="remoteSaturation" min="0" max="2" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="remoteSepia">Sepia:</label>
-          <input type="range" id="remoteSepia" min="0" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="remoteGrayscale">Grayscale:</label>
-          <input type="range" id="remoteGrayscale" min="0" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="remoteInvert">Invert:</label>
-          <input type="range" id="remoteInvert" min="0" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="remoteGamma">Gamma:</label>
-          <input type="range" id="remoteGamma" min="0.1" max="3" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="remoteVolume">Volume:</label>
-          <input type="range" id="remoteVolume" min="0" max="1" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="remotePan">Pan:</label>
-          <input type="range" id="remotePan" min="-1" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="remoteTilt">Tilt:</label>
-          <input type="range" id="remoteTilt" min="-90" max="90" step="1" value="0">
-        </div>
-        <div class="control-group">
-          <label for="remoteZoom">Zoom:</label>
-          <input type="range" id="remoteZoom" min="1" max="3" step="0.1" value="1">
-        </div>
-        <div class="control-group">
-          <label for="remoteResolution">Resolution:</label>
-          <select id="remoteResolution">
-            <option value="default">Default</option>
-            <option value="qvga">QVGA (320x240)</option>
-            <option value="vga">VGA (640x480)</option>
-            <option value="hd">HD (1280x720)</option>
-            <option value="fullhd">Full HD (1920x1080)</option>
-          </select>
-        </div>
-      </div>
     </div>
   </div>
 
   <div id="progress" style="margin-top: 1rem; font-size: 1.2rem;"></div>
-  <div id="recordings" style="margin-top: 1rem;"></div>
+  <div id="recordings" style="margin-top: 1rem; font-size: 1.2rem;"></div>
 
   <script type="module" src="./main.js"></script>
 </body>

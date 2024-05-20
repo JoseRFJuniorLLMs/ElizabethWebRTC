@@ -20,6 +20,12 @@ video {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: row-reverse; /* Coloca os controles à esquerda */
+}
+
+.video-container {
+  display: flex; /* Permite organizar video e controles */
+  align-items: center; /* Alinha verticalmente */
 }
 
 button {
@@ -29,9 +35,9 @@ button {
 }
 
 button img {
-  width: 50px; /* Adjust the size as needed */
-  height: 50px; /* Adjust the size as needed */
-  border-radius: 50%; /* Makes the image rounded */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
 
 .controls {
@@ -39,6 +45,7 @@ button img {
   flex-direction: column;
   align-items: center;
   margin-top: 1rem;
+  margin-right: 1rem; /* Espaço entre controles e vídeo */
 }
 
 .control-group {
@@ -62,8 +69,26 @@ button img {
 }
 
 /* Adicione esta regra ao seu arquivo style.css */
-
 #logImage {
   width: 40px; /* Largura desejada */
   height: 40px; /* Altura desejada */
 }
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .videos {
+    flex-direction: column; /* Empilha vídeos em telas menores */
+  }
+  #localControls {
+    margin-right: 0; /* Remove margem quando empilhado */
+    margin-top: 1rem; /* Adiciona margem entre vídeo e controles */
+  }
+}
+
+video {
+  width: 35vw; /* Exemplo de largura */
+}
+#localControls {
+  width: 15vw; /* Exemplo de largura */
+}
+
