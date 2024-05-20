@@ -40,9 +40,38 @@ const callInput = document.getElementById('callInput');
 const answerButton = document.getElementById('answerButton');
 const remoteVideo = document.getElementById('remoteVideo');
 const hangupButton = document.getElementById('hangupButton');
+const finishCallButton = document.getElementById('finishCallButton');
+const refreshCallsButton = document.getElementById('refreshCallsButton');
+const callList = document.getElementById('callList');
+
+// Function to list call documents
+/* async function listCalls() {
+  const callsSnapshot = await firestore.collection('calls').get();
+  callList.innerHTML = '';
+  callsSnapshot.forEach(doc => {
+    const option = document.createElement('option');
+    option.value = doc.id;
+    option.textContent = doc.id;
+    callList.appendChild(option);
+  });
+} */
+
+// Função para listar documentos de chamadas
+async function listCalls() {
+  const callsSnapshot = await firestore.collection('calls').get();
+  callList.innerHTML = '';
+  callsSnapshot.forEach(doc => {
+    // Verificar se o ID do documento não é igual ao ID da chamada que você criou
+    if (doc.id !== callInput.value) {
+      const option = document.createElement('option');
+      option.value = doc.id;
+      option.textContent = doc.id;
+      callList.appendChild(option);
+    }
+  });
+}
 
 // 1. Setup media sources
-
 webcamButton.onclick = async () => {
   localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   remoteStream = new MediaStream();
@@ -69,19 +98,16 @@ webcamButton.onclick = async () => {
 
 // 2. Create an offer
 callButton.onclick = async () => {
-  // Reference Firestore collections for signaling
   const callDoc = firestore.collection('calls').doc();
   const offerCandidates = callDoc.collection('offerCandidates');
   const answerCandidates = callDoc.collection('answerCandidates');
 
   callInput.value = callDoc.id;
 
-  // Get candidates for caller, save to db
   pc.onicecandidate = (event) => {
     event.candidate && offerCandidates.add(event.candidate.toJSON());
   };
 
-  // Create offer
   const offerDescription = await pc.createOffer();
   await pc.setLocalDescription(offerDescription);
 
@@ -92,7 +118,6 @@ callButton.onclick = async () => {
 
   await callDoc.set({ offer });
 
-  // Listen for remote answer
   callDoc.onSnapshot((snapshot) => {
     const data = snapshot.data();
     if (!pc.currentRemoteDescription && data?.answer) {
@@ -101,7 +126,6 @@ callButton.onclick = async () => {
     }
   });
 
-  // When answered, add candidate to peer connection
   answerCandidates.onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
@@ -142,7 +166,6 @@ answerButton.onclick = async () => {
 
   offerCandidates.onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
-      console.log(change);
       if (change.type === 'added') {
         let data = change.doc.data();
         pc.addIceCandidate(new RTCIceCandidate(data));
@@ -150,3 +173,24 @@ answerButton.onclick = async () => {
     });
   });
 };
+
+// 4. Clean up the call and documents in Firestore
+finishCallButton.onclick = async () => {
+  const callsSnapshot = await firestore.collection('calls').get();
+  const batch = firestore.batch();
+
+  callsSnapshot.forEach(doc => {
+    batch.delete(doc.ref);
+  });
+
+  await batch.commit();
+  alert('All call documents have been deleted.');
+};
+
+// Refresh call list
+refreshCallsButton.onclick = () => {
+  listCalls();
+};
+
+// Initial call list load
+listCalls();
