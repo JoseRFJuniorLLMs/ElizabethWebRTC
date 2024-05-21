@@ -1,16 +1,16 @@
 {
   "name": "elizabetwebrtc",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
   },
   "devDependencies": {
-    "vite": "5.2.11"
+    "vite": "^2.0.5"
   },
   "dependencies": {
-    "firebase": "10.12.1",
+    "firebase": "^8.2.10",
     "wavesurfer.js": "^7.7.15"
   }
 }

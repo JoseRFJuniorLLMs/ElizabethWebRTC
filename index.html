@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elizabeth WebRTC</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <h1>Elizabeth WebRTC</h1>
   <audio id="notificationSound" src="som.mp3"></audio>
-  <button id="startButton"><img src="cam.png" alt="Start Call"></button>
-  <button id="startAudioButton"><img src="mic.png" alt="Start Call"></button>
-  <button id="finishCallButton" disabled><img src="end-cam.png" alt="Finish Call"></button>
-  <img id="logImage" src="log.png" alt="Log Image" style="display: none;">
+  <button id="startButton"><img src="cam.png" alt="Start Call" /></button>
+  <button id="startAudioButton"><img src="mic.png" alt="Start Call" /></button>
+  <button id="finishCallButton"><img src="end-cam.png" alt="Finish Call" /></button>
+  <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
 
   <div id="waveform-container">
     <div id="localWaveform" style="border: 1px solid #ddd; border-radius: 4px; margin-top: 1rem"></div>
   </div>
-
+  
   <div class="videos">
     <div class="video-container">
       <video id="webcamVideo" autoplay playsinline></video>
@@ -31,6 +31,6 @@
   <div id="progress" style="margin-top: 1rem; font-size: 1.2rem;"></div>
   <div id="recordings" style="margin-top: 1rem; font-size: 1.2rem;"></div>
 
-  <script type="module" src="main.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>
