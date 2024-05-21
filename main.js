@@ -1,10 +1,10 @@
 import './style.css';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, doc, getDocs, setDoc, onSnapshot, deleteDoc, updateDoc, addDoc, getDoc } from 'firebase/firestore';
 import WaveSurfer from 'wavesurfer.js';
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js';
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC25TEAPAQ6b4HuCB9AWAef0NeaEvsF9M8",
   authDomain: "elizabethrtc.firebaseapp.com",
@@ -15,10 +15,8 @@ const firebaseConfig = {
   measurementId: "G-FPT1XMMKHS"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-const firestore = firebase.firestore();
+const firebaseApp = initializeApp(firebaseConfig);
+const firestore = getFirestore(firebaseApp);
 
 const servers = {
   iceServers: [
@@ -34,6 +32,8 @@ let localStream = null;
 let remoteStream = null;
 let wavesurfer = null;
 let record = null;
+let callDocRef = null;
+let isCaller = false;
 
 const startButton = document.getElementById('startButton');
 const finishCallButton = document.getElementById('finishCallButton');
@@ -41,22 +41,6 @@ const logImage = document.getElementById('logImage');
 const webcamVideo = document.getElementById('webcamVideo');
 const remoteVideo = document.getElementById('remoteVideo');
 const startAudioButton = document.getElementById('startAudioButton');
-
-const remoteControls = {
-  brightness: document.getElementById('remoteBrightness'),
-  contrast: document.getElementById('remoteContrast'),
-  saturation: document.getElementById('remoteSaturation'),
-  sepia: document.getElementById('remoteSepia'),
-  grayscale: document.getElementById('remoteGrayscale'),
-  invert: document.getElementById('remoteInvert'),
-  gamma: document.getElementById('remoteGamma'),
-  volume: document.getElementById('remoteVolume'),
-  pan: document.getElementById('remotePan'),
-  tilt: document.getElementById('remoteTilt'),
-  zoom: document.getElementById('remoteZoom'),
-  resolution: document.getElementById('remoteResolution'),
-  size: document.getElementById('remoteSize')
-};
 
 const createWaveSurfer = () => {
   if (wavesurfer) {
@@ -133,33 +117,11 @@ const updateProgress = (time) => {
   document.querySelector('#progress').textContent = formattedTime;
 };
 
-const setVolume = (videoElement, volume) => {
-  videoElement.volume = volume;
-};
-
-const setupControlListeners = () => {
-  Object.keys(localControls).forEach(control => {
-    if (control !== 'volume') {
-      localControls[control].addEventListener('input', applyLocalFilters);
-    } else {
-      localControls[control].addEventListener('input', () => setVolume(webcamVideo, localControls[control].value));
-    }
-  });
-
-  Object.keys(remoteControls).forEach(control => {
-    if (control !== 'volume') {
-      remoteControls[control].addEventListener('input', applyRemoteFilters);
-    } else {
-      remoteControls[control].addEventListener('input', () => setVolume(remoteVideo, remoteControls[control].value));
-    }
-  });
-};
-
-startButton.onclick = async () => {
+const startCall = async (video) => {
   const notificationSound = document.getElementById('notificationSound');
   notificationSound.play();
 
-  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  localStream = await navigator.mediaDevices.getUserMedia({ video, audio: true });
   remoteStream = new MediaStream();
 
   localStream.getTracks().forEach((track) => {
@@ -172,26 +134,28 @@ startButton.onclick = async () => {
     });
   };
 
-  webcamVideo.srcObject = localStream;
+  if (video) {
+    webcamVideo.srcObject = localStream;
+  }
   remoteVideo.srcObject = remoteStream;
 
   // Start WaveSurfer for audio visualization
   createWaveSurfer();
   record.startRecording();
 
-  const callsSnapshot = await firestore.collection('calls').get();
+  const callsSnapshot = await getDocs(collection(firestore, 'calls'));
   const existingCallDoc = callsSnapshot.docs[0];
 
   if (existingCallDoc) {
-    const callDoc = firestore.collection('calls').doc(existingCallDoc.id);
-    const answerCandidates = callDoc.collection('answerCandidates');
-    const offerCandidates = callDoc.collection('offerCandidates');
+    callDocRef = doc(firestore, 'calls', existingCallDoc.id);
+    const answerCandidates = collection(callDocRef, 'answerCandidates');
+    const offerCandidates = collection(callDocRef, 'offerCandidates');
 
     pc.onicecandidate = (event) => {
-      event.candidate && answerCandidates.add(event.candidate.toJSON());
+      event.candidate && addDoc(answerCandidates, event.candidate.toJSON());
     };
 
-    const callData = (await callDoc.get()).data();
+    const callData = existingCallDoc.data();
     const offerDescription = callData.offer;
     await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
 
@@ -203,9 +167,9 @@ startButton.onclick = async () => {
       sdp: answerDescription.sdp,
     };
 
-    await callDoc.update({ answer });
+    await updateDoc(callDocRef, { answer });
 
-    offerCandidates.onSnapshot((snapshot) => {
+    onSnapshot(offerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           let data = change.doc.data();
@@ -215,12 +179,12 @@ startButton.onclick = async () => {
     });
 
   } else {
-    const callDoc = firestore.collection('calls').doc();
-    const offerCandidates = callDoc.collection('offerCandidates');
-    const answerCandidates = callDoc.collection('answerCandidates');
+    callDocRef = doc(collection(firestore, 'calls'));
+    const offerCandidates = collection(callDocRef, 'offerCandidates');
+    const answerCandidates = collection(callDocRef, 'answerCandidates');
 
     pc.onicecandidate = (event) => {
-      event.candidate && offerCandidates.add(event.candidate.toJSON());
+      event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
     };
 
     const offerDescription = await pc.createOffer();
@@ -231,9 +195,10 @@ startButton.onclick = async () => {
       type: offerDescription.type,
     };
 
-    await callDoc.set({ offer });
+    await setDoc(callDocRef, { offer });
+    isCaller = true;
 
-    callDoc.onSnapshot((snapshot) => {
+    onSnapshot(callDocRef, (snapshot) => {
       const data = snapshot.data();
       if (!pc.currentRemoteDescription && data?.answer) {
         const answerDescription = new RTCSessionDescription(data.answer);
@@ -241,7 +206,7 @@ startButton.onclick = async () => {
       }
     });
 
-    answerCandidates.onSnapshot((snapshot) => {
+    onSnapshot(answerCandidates, (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           const candidate = new RTCIceCandidate(change.doc.data());
@@ -253,20 +218,31 @@ startButton.onclick = async () => {
 
   finishCallButton.disabled = false;
   startButton.disabled = true;
-
-  startAudioButton.disabled = false;
+  startAudioButton.disabled = true;
 };
 
+startButton.onclick = () => startCall(true);
+
+startAudioButton.onclick = () => startCall(false);
+
 finishCallButton.onclick = async () => {
-  const callsSnapshot = await firestore.collection('calls').get();
-  const batch = firestore.batch();
+  if (callDocRef) {
+    if (isCaller) {
+      const offerCandidatesSnapshot = await getDocs(collection(callDocRef, 'offerCandidates'));
+      offerCandidatesSnapshot.forEach(async (candidate) => {
+        await deleteDoc(candidate.ref);
+      });
+      await deleteDoc(callDocRef);
+    } else {
+      const answerCandidatesSnapshot = await getDocs(collection(callDocRef, 'answerCandidates'));
+      answerCandidatesSnapshot.forEach(async (candidate) => {
+        await deleteDoc(candidate.ref);
+      });
+      await updateDoc(callDocRef, { answer: null });
+    }
+  }
 
-  callsSnapshot.forEach(doc => {
-    batch.delete(doc.ref);
-  });
-
-  await batch.commit();
-  alert('Call has been finished and all call documents have been deleted.');
+  alert('Your session has been finished.');
 
   pc.close();
   localStream.getTracks().forEach(track => track.stop());
@@ -274,7 +250,7 @@ finishCallButton.onclick = async () => {
 
   finishCallButton.disabled = true;
   startButton.disabled = false;
-  startAudioButton.disabled = true;
+  startAudioButton.disabled = false;
 
   if (wavesurfer) {
     wavesurfer.destroy();
@@ -282,7 +258,7 @@ finishCallButton.onclick = async () => {
   }
 };
 
-firestore.collection('calls').onSnapshot((snapshot) => {
+onSnapshot(collection(firestore, 'calls'), (snapshot) => {
   if (!snapshot.empty) {
     logImage.style.display = 'block';
   } else {
@@ -290,20 +266,7 @@ firestore.collection('calls').onSnapshot((snapshot) => {
   }
 });
 
-startAudioButton.onclick = () => {
-  const notificationSound = document.getElementById('notificationSound');
-  notificationSound.play();
-
-  createWaveSurfer();
-  record.startRecording();
-};
-
 document.querySelector('input[type="checkbox"]').onclick = (e) => {
   scrollingWaveform = e.target.checked;
   createWaveSurfer();
 };
-  
-// Configurar listeners dos controles locais e remotos
-setupControlListeners(localControls, applyLocalFilters);
-
-setupControlListeners();

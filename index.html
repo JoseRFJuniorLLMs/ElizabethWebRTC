@@ -1,64 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elizabeth WebRTC</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Elizabeth WebRTC</h1>
   <audio id="notificationSound" src="som.mp3"></audio>
-  <button id="startButton"><img src="cam.png" alt="Start Call" /></button>
-  <button id="startAudioButton"><img src="mic.png" alt="Start Call" /></button>
-  <button id="finishCallButton"><img src="end-cam.png" alt="Finish Call" /></button>
-  <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
+  <button id="startButton"><img src="cam.png" alt="Start Call"></button>
+  <button id="startAudioButton"><img src="mic.png" alt="Start Call"></button>
+  <button id="finishCallButton" disabled><img src="end-cam.png" alt="Finish Call"></button>
+  <img id="logImage" src="log.png" alt="Log Image" style="display: none;">
 
   <div id="waveform-container">
     <div id="localWaveform" style="border: 1px solid #ddd; border-radius: 4px; margin-top: 1rem"></div>
   </div>
-  
+
   <div class="videos">
     <div class="video-container">
       <video id="webcamVideo" autoplay playsinline></video>
-      <div class="controls" id="localControls">
-        <!-- Controls for local video -->
-        <div class="control-group">
-          <label for="localBrightness">Brightness:</label>
-          <input type="range" id="localBrightness" min="0" max="2" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="localContrast">Contrast:</label>
-          <input type="range" id="localContrast" min="0" max="2" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="localSaturation">Saturation:</label>
-          <input type="range" id="localSaturation" min="0" max="2" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="localSepia">Sepia:</label>
-          <input type="range" id="localSepia" min="0" max="1" step="0.01" value="0">
-        </div>
-        <div class="control-group">
-          <label for="localVolume">Volume:</label>
-          <input type="range" id="localVolume" min="0" max="1" step="0.01" value="1">
-        </div>
-        <div class="control-group">
-          <label for="localResolution">Resolution:</label>
-          <select id="localResolution">
-            <option value="default">Default</option>
-            <option value="qvga">QVGA (320x240)</option>
-            <option value="vga">VGA (640x480)</option>
-            <option value="hd">HD (1280x720)</option>
-            <option value="fullhd">Full HD (1920x1080)</option>
-          </select>
-        </div>
-        <div class="control-group">
-          <label for="localSize">Size:</label>
-          <input type="range" id="localSize" min="1" max="3" step="0.1" value="1">
-        </div>
-      </div>
     </div>
     <div class="video-container">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -68,6 +31,6 @@
   <div id="progress" style="margin-top: 1rem; font-size: 1.2rem;"></div>
   <div id="recordings" style="margin-top: 1rem; font-size: 1.2rem;"></div>
 
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
