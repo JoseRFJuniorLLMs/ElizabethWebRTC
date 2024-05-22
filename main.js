@@ -42,22 +42,6 @@ const webcamVideo = document.getElementById('webcamVideo');
 const remoteVideo = document.getElementById('remoteVideo');
 const startAudioButton = document.getElementById('startAudioButton');
 
-const remoteControls = {
-  brightness: document.getElementById('remoteBrightness'),
-  contrast: document.getElementById('remoteContrast'),
-  saturation: document.getElementById('remoteSaturation'),
-  sepia: document.getElementById('remoteSepia'),
-  grayscale: document.getElementById('remoteGrayscale'),
-  invert: document.getElementById('remoteInvert'),
-  gamma: document.getElementById('remoteGamma'),
-  volume: document.getElementById('remoteVolume'),
-  pan: document.getElementById('remotePan'),
-  tilt: document.getElementById('remoteTilt'),
-  zoom: document.getElementById('remoteZoom'),
-  resolution: document.getElementById('remoteResolution'),
-  size: document.getElementById('remoteSize')
-};
-
 const createWaveSurfer = () => {
   if (wavesurfer) {
     wavesurfer.destroy();
@@ -303,7 +287,3 @@ document.querySelector('input[type="checkbox"]').onclick = (e) => {
   createWaveSurfer();
 };
   
-// Configurar listeners dos controles locais e remotos
-setupControlListeners(localControls, applyLocalFilters);
-
-setupControlListeners();
