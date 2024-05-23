@@ -241,6 +241,103 @@ startButton.onclick = async () => {
   startAudioButton.disabled = false;
 };
 
+startAudioButton.onclick = async () => {
+  const notificationSound = document.getElementById('notificationSound');
+  notificationSound.play();
+
+  localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  remoteStream = new MediaStream();
+
+  localStream.getTracks().forEach((track) => {
+    pc.addTrack(track, localStream);
+  });
+
+  pc.ontrack = (event) => {
+    event.streams[0].getTracks().forEach((track) => {
+      remoteStream.addTrack(track);
+    });
+  };
+
+  // Start WaveSurfer for audio visualization
+  createWaveSurfer();
+  record.startRecording();
+
+  const callsSnapshot = await firestore.collection('calls').get();
+  const existingCallDoc = callsSnapshot.docs[0];
+
+  if (existingCallDoc) {
+    const callDoc = firestore.collection('calls').doc(existingCallDoc.id);
+    const answerCandidates = callDoc.collection('answerCandidates');
+    const offerCandidates = callDoc.collection('offerCandidates');
+
+    pc.onicecandidate = (event) => {
+      event.candidate && answerCandidates.add(event.candidate.toJSON());
+    };
+
+    const callData = (await callDoc.get()).data();
+    const offerDescription = callData.offer;
+    await pc.setRemoteDescription(new RTCSessionDescription(offerDescription));
+
+    const answerDescription = await pc.createAnswer();
+    await pc.setLocalDescription(answerDescription);
+
+    const answer = {
+      type: answerDescription.type,
+      sdp: answerDescription.sdp,
+    };
+
+    await callDoc.update({ answer });
+
+    offerCandidates.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          let data = change.doc.data();
+          pc.addIceCandidate(new RTCIceCandidate(data));
+        }
+      });
+    });
+
+  } else {
+    const callDoc = firestore.collection('calls').doc();
+    const offerCandidates = callDoc.collection('offerCandidates');
+    const answerCandidates = callDoc.collection('answerCandidates');
+
+    pc.onicecandidate = (event) => {
+      event.candidate && offerCandidates.add(event.candidate.toJSON());
+    };
+
+    const offerDescription = await pc.createOffer();
+    await pc.setLocalDescription(offerDescription);
+
+    const offer = {
+      sdp: offerDescription.sdp,
+      type: offerDescription.type,
+    };
+
+    await callDoc.set({ offer });
+
+    callDoc.onSnapshot((snapshot) => {
+      const data = snapshot.data();
+      if (!pc.currentRemoteDescription && data?.answer) {
+        const answerDescription = new RTCSessionDescription(data.answer);
+        pc.setRemoteDescription(answerDescription);
+      }
+    });
+
+    answerCandidates.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const candidate = new RTCIceCandidate(change.doc.data());
+          pc.addIceCandidate(candidate);
+        }
+      });
+    });
+  }
+
+  finishCallButton.disabled = false;
+  startAudioButton.disabled = true;
+};
+
 finishCallButton.onclick = async () => {
   const callsSnapshot = await firestore.collection('calls').get();
   const batch = firestore.batch();
@@ -258,7 +355,7 @@ finishCallButton.onclick = async () => {
 
   finishCallButton.disabled = true;
   startButton.disabled = false;
-  startAudioButton.disabled = true;
+  startAudioButton.disabled = false;
 
   if (wavesurfer) {
     wavesurfer.destroy();
@@ -274,16 +371,7 @@ firestore.collection('calls').onSnapshot((snapshot) => {
   }
 });
 
-startAudioButton.onclick = () => {
-  const notificationSound = document.getElementById('notificationSound');
-  notificationSound.play();
-
-  createWaveSurfer();
-  record.startRecording();
-};
-
 document.querySelector('input[type="checkbox"]').onclick = (e) => {
   scrollingWaveform = e.target.checked;
   createWaveSurfer();
 };
-  

@@ -13,21 +13,37 @@
   <h1>Elizabeth WebRTC</h1>
   <audio id="notificationSound" src="som.mp3"></audio>
   <button id="startButton"><img src="cam.png" alt="Start Call" /></button>
-  <button id="startAudioButton"><img src="mic.png" alt="Start Call" /></button>
+
+  <button id="startAudioButton"><img src="mic.png" alt="Start Audio Call" /></button>
+  <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
+
   <button id="finishCallButton"><img src="end-cam.png" alt="Finish Call" /></button>
   <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
 
   <div id="waveform-container">
     <div id="localWaveform" style="border: 1px solid #ddd; border-radius: 4px; margin-top: 1rem"></div>
   </div>
+  <div id="buttons">
+    <button id="sendButton" disabled>Send</button>
+  </div>
 
   <div class="videos">
     <div class="video-container">
-      <video id="webcamVideo" autoplay playsinline></video>
+      <div id="send">
+        <h2>Send</h2>
+        <textarea id="dataChannelSend" disabled placeholder="Press Start, enter some text, then press Send."></textarea>
+        <video id="webcamVideo" autoplay playsinline></video>
+      </div>
     </div>
+
     <div class="video-container">
-      <video id="remoteVideo" autoplay playsinline></video>
+      <div id="receive">
+        <h2>Receive</h2>
+        <textarea id="dataChannelReceive" disabled></textarea>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
     </div>
+
   </div>
 
   <div id="progress" style="margin-top: 1rem; font-size: 1.2rem;"></div>
