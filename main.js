@@ -4,7 +4,7 @@ import 'firebase/firestore';
 import WaveSurfer from 'wavesurfer.js';
 import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js';
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC25TEAPAQ6b4HuCB9AWAef0NeaEvsF9M8",
   authDomain: "elizabethrtc.firebaseapp.com",
@@ -239,6 +239,8 @@ startButton.onclick = async () => {
   startButton.disabled = true;
 
   startAudioButton.disabled = false;
+
+  createDataChannel(pc);
 };
 
 startAudioButton.onclick = async () => {
@@ -268,7 +270,7 @@ startAudioButton.onclick = async () => {
   if (existingCallDoc) {
     const callDoc = firestore.collection('calls').doc(existingCallDoc.id);
     const answerCandidates = callDoc.collection('answerCandidates');
-    const offerCandidates = callDoc.collection('offerCandidates');
+    const offerCandidates    = callDoc.collection('offerCandidates');
 
     pc.onicecandidate = (event) => {
       event.candidate && answerCandidates.add(event.candidate.toJSON());
@@ -336,6 +338,8 @@ startAudioButton.onclick = async () => {
 
   finishCallButton.disabled = false;
   startAudioButton.disabled = true;
+  createDataChannel(pc);
+
 };
 
 finishCallButton.onclick = async () => {
@@ -375,3 +379,98 @@ document.querySelector('input[type="checkbox"]').onclick = (e) => {
   scrollingWaveform = e.target.checked;
   createWaveSurfer();
 };
+
+export let localConnection = null;
+export let remoteConnection = null;
+export let sendChannel = null;
+export let receiveChannel = null;
+
+export function createConnection() {
+  const servers = null;
+
+  localConnection = new RTCPeerConnection(servers);
+  localConnection.onicecandidate = e => onIceCandidate(localConnection, e);
+
+  remoteConnection = new RTCPeerConnection(servers);
+  remoteConnection.onicecandidate = e => onIceCandidate(remoteConnection, e);
+  remoteConnection.ondatachannel = receiveChannelCallback;
+
+  sendChannel = localConnection.createDataChannel('sendDataChannel');
+  sendChannel.onopen = onSendChannelStateChange;
+  sendChannel.onclose = onSendChannelStateChange;
+
+  localConnection.createOffer()
+    .then(offer => localConnection.setLocalDescription(offer))
+    .then(() => remoteConnection.setRemoteDescription(localConnection.localDescription))
+    .then(() => remoteConnection.createAnswer())
+    .then(answer => remoteConnection.setLocalDescription(answer))
+    .then(() => localConnection.setRemoteDescription(remoteConnection.localDescription));
+
+  document.getElementById('startButton').disabled = true;
+  document.getElementById('sendButton').disabled = false;
+  document.getElementById('finishCallButton').disabled = false;
+  document.getElementById('dataChannelSend').disabled = false;
+}
+
+export function sendData() {
+  const data = document.getElementById('dataChannelSend').value;
+  sendChannel.send(data);
+  document.getElementById('dataChannelSend').value = '';
+}
+
+export function closeConnection() {
+  localConnection.close();
+  remoteConnection.close();
+  localConnection = null;
+  remoteConnection = null;
+  sendChannel = null;
+  receiveChannel = null;
+
+  document.getElementById('startButton').disabled = false;
+  document.getElementById('sendButton').disabled = true;
+  document.getElementById('finishCallButton').disabled = true;
+  document.getElementById('dataChannelSend').disabled = true;
+  document.getElementById('dataChannelReceive').disabled = true;
+}
+
+function onIceCandidate(pc, event) {
+  if (event.candidate) {
+    const otherPc = (pc === localConnection) ? remoteConnection : localConnection;
+    otherPc.addIceCandidate(new RTCIceCandidate(event.candidate));
+  }
+}
+
+function receiveChannelCallback(event) {
+  receiveChannel = event.channel;
+  receiveChannel.onmessage = onReceiveMessageCallback;
+  receiveChannel.onopen = onReceiveChannelStateChange;
+  receiveChannel.onclose = onReceiveChannelStateChange;
+}
+
+function onReceiveMessageCallback(event) {
+  document.getElementById('dataChannelReceive').value = event.data;
+}
+
+function onSendChannelStateChange() {
+  const readyState = sendChannel.readyState;
+  if (readyState === 'open') {
+    document.getElementById('dataChannelSend').disabled = false;
+    document.getElementById('dataChannelSend').focus();
+    document.getElementById('sendButton').disabled = false;
+    document.getElementById('finishCallButton').disabled = false;
+  } else {
+    document.getElementById('dataChannelSend').disabled = true;
+    document.getElementById('sendButton').disabled = true;
+    document.getElementById('finishCallButton').disabled = true;
+  }
+}
+
+function onReceiveChannelStateChange() {
+  const readyState = receiveChannel.readyState;
+  if (readyState === 'open') {
+    document.getElementById('dataChannelReceive').disabled = false;
+  } else {
+    document.getElementById('dataChannelReceive').disabled = true;
+  }
+}
+

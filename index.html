@@ -10,28 +10,27 @@
 </head>
 
 <body>
-  <h1>Elizabeth WebRTC</h1>
-  <audio id="notificationSound" src="som.mp3"></audio>
   <button id="startButton"><img src="cam.png" alt="Start Call" /></button>
-
   <button id="startAudioButton"><img src="mic.png" alt="Start Audio Call" /></button>
-  <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
-
   <button id="finishCallButton"><img src="end-cam.png" alt="Finish Call" /></button>
-  <img id="logImage" src="log.png" alt="Log Image" style="display: none;" />
 
+  <h1>Elizabeth AI</h1>
+  <div style="display: flex; justify-content: center; align-items: center;">
+    <img id="logImage" src="log.png" alt="Log Image" style="display: none; width: 200px; height: auto;" />
+  </div>
+
+
+  <audio id="notificationSound" src="som.mp3"></audio>
   <div id="waveform-container">
     <div id="localWaveform" style="border: 1px solid #ddd; border-radius: 4px; margin-top: 1rem"></div>
-  </div>
-  <div id="buttons">
-    <button id="sendButton" disabled>Send</button>
   </div>
 
   <div class="videos">
     <div class="video-container">
       <div id="send">
         <h2>Send</h2>
-        <textarea id="dataChannelSend" disabled placeholder="Press Start, enter some text, then press Send."></textarea>
+        <textarea id="dataChannelSend" placeholder="Text"></textarea>
+        <button id="sendButton"><img src="send.png" alt="send" /></button>
         <video id="webcamVideo" autoplay playsinline></video>
       </div>
     </div>
@@ -50,6 +49,7 @@
   <div id="recordings" style="margin-top: 1rem; font-size: 1.2rem;"></div>
 
   <script type="module" src="./main.js"></script>
+
 </body>
 
 </html>
