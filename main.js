@@ -68,6 +68,32 @@ notificationSound.play();
 // Chamar a função para solicitar permissão de notificação ao carregar a página
 requestNotificationPermission();
 
+// Função para mostrar notificação no navegador
+function showNotification(title, body) {
+    // Verifica se a permissão para mostrar notificações foi concedida
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body });
+    } else if (Notification.permission !== 'denied') {
+      // Pede permissão para mostrar notificações
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification(title, { body });
+        }
+      });
+    }
+  }
+  
+  // Listener para detecção de novos usuários na sala
+  firestore.collection('calls').onSnapshot((snapshot) => {
+    if (!snapshot.empty) {
+      logImage.style.display = 'block';
+      showNotification('Novo Usuário', 'Um novo usuário entrou na sala.');
+    } else {
+      logImage.style.display = 'none';
+    }
+  });
+
+  
 const createWaveSurfer = () => {
 if (wavesurfer) {
 wavesurfer.destroy();
