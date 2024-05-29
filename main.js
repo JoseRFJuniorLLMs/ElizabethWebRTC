@@ -6,13 +6,13 @@ import RecordPlugin from 'wavesurfer.js/dist/plugins/record.esm.js';
 
 // Configuração do Firebase
 const firebaseConfig = {
-apiKey: "AIzaSyC25TEAPAQ6b4HuCB9AWAef0NeaEvsF9M8",
-authDomain: "elizabethrtc.firebaseapp.com",
-projectId: "elizabethrtc",
-storageBucket: "elizabethrtc.appspot.com",
-messagingSenderId: "954247291412",
-appId: "1:954247291412:web:da9caa6f7a7e8ccff7fd01",
-measurementId: "G-FPT1XMMKHS"
+  apiKey: "AIzaSyCTf11cszj5rb47Ump2dbM2X8GN4L6nX8M",
+  authDomain: "elizabeth-ai.firebaseapp.com",
+  projectId: "elizabeth-ai",
+  storageBucket: "elizabeth-ai.appspot.com",
+  messagingSenderId: "268438859981",
+  appId: "1:268438859981:web:19a3f5e373becc1edf7984",
+  measurementId: "G-KV0P1910W8"
 };
 
 if (!firebase.apps.length) {
@@ -53,36 +53,7 @@ console.log('Notification permission granted.');
 }
 };
 
-// Mostrar notificação
-const showNotification = (message) => {
-if ('Notification' in window && Notification.permission === 'granted') {
-new Notification(message);
-}
-};
-
-// Função para reproduzir som de notificação
-const playNotificationSound = () => {
-notificationSound.play();
-};
-
-// Chamar a função para solicitar permissão de notificação ao carregar a página
-requestNotificationPermission();
-
-// Função para mostrar notificação no navegador
-function showNotification(title, body) {
-    // Verifica se a permissão para mostrar notificações foi concedida
-    if (Notification.permission === 'granted') {
-      new Notification(title, { body });
-    } else if (Notification.permission !== 'denied') {
-      // Pede permissão para mostrar notificações
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          new Notification(title, { body });
-        }
-      });
-    }
-  }
-  
+ 
   // Listener para detecção de novos usuários na sala
   firestore.collection('calls').onSnapshot((snapshot) => {
     if (!snapshot.empty) {
